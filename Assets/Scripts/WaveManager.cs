@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEngine.InputSystem; // <-- 1. IMPORT NECESAR PENTRU FIX
+using UnityEngine.InputSystem;
 
 public class WaveManager : MonoBehaviour
 {
@@ -17,10 +17,7 @@ public class WaveManager : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
+        if (instance == null) instance = this;
     }
 
     void Start()
@@ -30,20 +27,19 @@ public class WaveManager : MonoBehaviour
 
     void Update()
     {
-        // 2. FIX PENTRU EROARE:
-        // Verificăm tasta SPACE folosind noul sistem, doar când valul nu rulează
+        // Pornim valul următor doar dacă nu rulează deja și apăsăm SPACE
         if (!waveRunning && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             StartNewWave();
         }
     }
 
-    void StartNewWave()
+    public void StartNewWave()
     {
         timeText.color = Color.white;
         currentWave++;
         waveRunning = true;
-        currentWaveTime = 30; // Durata rundei
+        currentWaveTime = 30; // Durata rundei (poți pune 60 dacă vrei un minut)
 
         waveText.text = "Wave " + currentWave;
 
@@ -63,7 +59,6 @@ public class WaveManager : MonoBehaviour
                 WaveComplete();
             }
         }
-        yield return null;
     }
 
     void WaveComplete()
@@ -71,7 +66,7 @@ public class WaveManager : MonoBehaviour
         StopAllCoroutines();
         waveRunning = false;
 
-        // Curățăm inamicii
+        // 1. Curățăm inamicii existenți
         if (EnemyManager.instance != null)
         {
             EnemyManager.instance.DestroyAllEnemies();
@@ -79,5 +74,11 @@ public class WaveManager : MonoBehaviour
 
         timeText.color = Color.red;
         timeText.text = "0";
+
+        // 2. APARE MENIUL DE CARDURI (Legătura cu GameManager)
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.LevelCompleted();
+        }
     }
 }

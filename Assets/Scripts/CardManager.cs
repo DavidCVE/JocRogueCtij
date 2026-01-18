@@ -20,25 +20,28 @@ public class CardManager : MonoBehaviour
         instance = this;
     }
 
-    // Această metodă lipsea și de aceea nu vedeai cardurile la început!
+    // Am comentat Start pentru ca cardurile să apară DOAR la final de Wave, nu la început
     private void Start()
     {
-        RandomizeNewCards(); // Apelează generarea la pornirea jocului
+        // RandomizeNewCards(); 
     }
 
     public void RandomizeNewCards()
     {
+        // Ștergem cardurile vechi dacă există
         if (cardOne != null) Destroy(cardOne);
         if (cardTwo != null) Destroy(cardTwo);
         if (cardThree != null) Destroy(cardThree);
 
         List<CardSO> randomizedCards = new List<CardSO>();
-        // Ne asigurăm că lista de cărți disponibile este creată din pachetul (deck) din Inspector
         List<CardSO> availableCards = new List<CardSO>(deck);
 
-        // Filtrare cărți unice
-        availableCards.RemoveAll(card => card.isUnique && alreadySelectedCards.Contains(card)
-        || card.unlocklevel >GameManager.Instance.GetCurrentLevel());
+        // --- COD CORECTAT AICI ---
+        // S-a schimbat 'unlocklevel' în 'unlockLevel' pentru a elimina eroarea CS1061
+        availableCards.RemoveAll(card =>
+            (card.isUnique && alreadySelectedCards.Contains(card)) ||
+            (GameManager.Instance != null && card.unlockLevel > GameManager.Instance.GetCurrentLevel())
+        );
 
         if (availableCards.Count < 3)
         {
@@ -48,7 +51,6 @@ public class CardManager : MonoBehaviour
 
         while (randomizedCards.Count < 3)
         {
-            // Folosim Random.Range pentru a alege o carte aleatorie
             CardSO randomCard = availableCards[UnityEngine.Random.Range(0, availableCards.Count)];
             if (!randomizedCards.Contains(randomCard))
             {
@@ -56,7 +58,7 @@ public class CardManager : MonoBehaviour
             }
         }
 
-        // Instanțiem cele 3 cărți pe pozițiile lor
+        // Creăm obiectele pe pozițiile setate în Inspector
         cardOne = InstantiateCard(randomizedCards[0], cardPositionOne);
         cardTwo = InstantiateCard(randomizedCards[1], cardPositionTwo);
         cardThree = InstantiateCard(randomizedCards[2], cardPositionThree);
@@ -64,13 +66,12 @@ public class CardManager : MonoBehaviour
 
     GameObject InstantiateCard(CardSO cardSO, Transform position)
     {
-        // Crearea vizuală a cardului în scenă
         GameObject cardGo = Instantiate(cardPrefab, position.position, Quaternion.identity, position);
         Card cardScript = cardGo.GetComponent<Card>();
 
         if (cardScript != null)
         {
-            cardScript.Setup(cardSO); // Trimite datele (imagine, text) către scriptul Card
+            cardScript.Setup(cardSO);
         }
 
         return cardGo;

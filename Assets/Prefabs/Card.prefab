@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1833037263779225140}
   - component: {fileID: 7856170847091761374}
   - component: {fileID: 6938194552649479660}
+  - component: {fileID: -1459380448577053039}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -27,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 1009528133275288455}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.0108, y: 2.8214, z: 0}
-  m_LocalScale: {x: 3.3273659, y: 3.7369971, z: 1}
+  m_LocalPosition: {x: -1.7675, y: 3.0748, z: 0}
+  m_LocalScale: {x: 1.4866, y: 1.5068, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 880719086170272425}
@@ -81,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: 10
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 0.7549869, b: 0.51886785, a: 1}
   m_FlipX: 0
@@ -107,6 +108,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Card
   cardImageRenderer: {fileID: 4803203412684885201}
   cardTextRenderer: {fileID: 761781688055701483}
+--- !u!61 &-1459380448577053039
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009528133275288455}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &2662590529369949559
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +232,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 15
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.7132075, g: 0.68763965, b: 0.68763965, a: 1}
   m_FlipX: 0
