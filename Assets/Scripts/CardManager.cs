@@ -119,7 +119,6 @@ public class CardManager : MonoBehaviour
                 case CardEffectType.DamageIncrease:
                     UnityEngine.Debug.Log("Damage crescut!");
 
-                    // Asigură-te că această linie NU are // în față:
                     player.damage += (int)selectedCard.effectValue;
                     break;
 
