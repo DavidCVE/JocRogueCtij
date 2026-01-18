@@ -30,29 +30,29 @@ public class GameManager : MonoBehaviour
         if (cardSelectionUI != null) cardSelectionUI.SetActive(false);
     }
 
-    // Apelat de WaveManager cand timpul = 0
+
     public void LevelCompleted()
     {
         currentLevel++;
-        Time.timeScale = 0f; // Pauza
+        Time.timeScale = 0f; 
 
         if (cardSelectionUI != null) cardSelectionUI.SetActive(true);
 
-        // Generam carduri noi
+
         if (CardManager.instance != null)
         {
             CardManager.instance.RandomizeNewCards();
         }
     }
 
-    // Apelat de CardManager dupa ce ai ales un card
+
     public void ResumeAfterCardSelection()
     {
         if (cardSelectionUI != null) cardSelectionUI.SetActive(false);
 
-        Time.timeScale = 1f; // Reluam timpul
+        Time.timeScale = 1f; 
 
-        // --- MODIFICARE: Pornim automat urmatorul wave
+
         if (WaveManager.instance != null)
         {
             WaveManager.instance.StartNewWave();

@@ -8,11 +8,11 @@ public class Enemy : MonoBehaviour
 
     Animator anim;
 
-    [Header("Charger Stats")] // Sectiune noua in Inspector
-    public bool isCharger;       // Bifezi asta DOAR la inamicul Charger
-    [SerializeField] float distanceToCharge = 5f; // Distanta de la care te simte
-    [SerializeField] float chargeSpeed = 20f;     // Viteza cand ataca (mai mare decat speed normal)
-    [SerializeField] float prepareTime = 2f;      // Timpul cat sta pe loc
+    [Header("Charger Stats")] 
+    public bool isCharger;       
+    [SerializeField] float distanceToCharge = 5f; 
+    [SerializeField] float chargeSpeed = 20f;     
+    [SerializeField] float prepareTime = 2f;      
 
     private bool isCharging;
     private bool isPreparingCharge;
@@ -27,28 +27,28 @@ public class Enemy : MonoBehaviour
     {
         if (player != null)
         {
-            // 1. Daca se pregateste de atac, NU se misca (iese din functie)
+
             if (isPreparingCharge) return;
 
-            // 2. Logica pentru Charger: E aproape? Nu ataca deja? E Charger?
+
             if (isCharger && !isCharging && Vector3.Distance(transform.position, player.position) < distanceToCharge)
             {
                 isPreparingCharge = true;
-                Invoke("StartCharging", prepareTime); // Cheama functia de atac dupa 2 secunde
+                Invoke("StartCharging", prepareTime); 
             }
 
-            // 3. Miscare (Codul tau vechi)
+
             Vector3 direction = (player.position - transform.position).normalized;
             transform.position += direction * speed * Time.deltaTime;
         }
     }
 
-    // Aceasta functie se activeaza automat dupa "prepareTime" secunde
+
     void StartCharging()
     {
-        isPreparingCharge = false; // Nu se mai pregateste
-        isCharging = true;         // Acum ataca efectiv
-        speed = chargeSpeed;       // Ii dam viteza mare!
+        isPreparingCharge = false; 
+        isCharging = true;         
+        speed = chargeSpeed;       
     }
 
     public void Hit(int damage)
@@ -70,7 +70,7 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Aici va veni logica de damage player mai tarziu
+            
         }
     }
 }
