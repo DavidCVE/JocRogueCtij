@@ -1,51 +1,116 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem; // Adăugat pentru a rezolva eroarea de Input
+﻿using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    public static Player instance;
+    [Header("UI & Components")]
+    [SerializeField] TextMeshProUGUI healthText;
+    Animator anim;
+    Rigidbody2D rb;
 
-    [Header("Player Stats")]
-    [SerializeField] float moveSpeed = 5f;
-    [SerializeField] int maxHealth = 100;
+    [Header("Stats")]
+
+    public float moveSpeed = 6f;
+    public int maxHealth = 100;
+    public int damage = 25;
+
     int currentHealth;
+    bool dead = false;
 
-    private void Awake()
+
+    Vector2 movement;
+    int facingDirection = 1;
+
+    private void Start()
     {
-        if (instance == null) instance = this;
+        anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+
         currentHealth = maxHealth;
+        UpdateHealthUI();
     }
 
-    void Update()
+    void OnMove(InputValue value)
     {
-        // REPARARE EROARE INPUT: Folosim Keyboard.current în loc de Input.GetAxisRaw
-        Vector2 moveInput = Vector2.zero;
-
-        if (Keyboard.current != null)
-        {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveInput.y = 1;
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveInput.y = -1;
-            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) moveInput.x = -1;
-            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) moveInput.x = 1;
-        }
-
-        // Mișcarea normalizată pentru a nu merge mai repede pe diagonală
-        transform.position += (Vector3)moveInput.normalized * moveSpeed * Time.deltaTime;
+        if (dead) return;
+        movement = value.Get<Vector2>();
     }
 
-    public void ApplyPowerUp(CardSO card)
+    private void Update()
     {
-        // REPARARE EROARE DEBUG: Folosim UnityEngine.Debug pentru a evita conflictul
-        if (card.cardText.Contains("health"))
+        if (dead)
         {
-            currentHealth += 20;
-            if (currentHealth > maxHealth) currentHealth = maxHealth;
-            UnityEngine.Debug.Log("Viata marita! HP actual: " + currentHealth);
+            movement = Vector2.zero;
+            anim.SetFloat("velocity", 0);
+            return;
         }
-        else if (card.cardText.Contains("Speed"))
+
+        anim.SetFloat("velocity", movement.magnitude);
+
+        if (movement.x != 0)
         {
-            moveSpeed += 1.5f;
-            UnityEngine.Debug.Log("Viteza marita! Viteza actuala: " + moveSpeed);
+            facingDirection = movement.x > 0 ? 1 : -1;
+            if (transform.childCount > 0)
+            {
+                transform.GetChild(0).localScale = new Vector2(facingDirection, 1);
+            }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (dead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        rb.linearVelocity = movement * moveSpeed;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Hit(20);
+        }
+    }
+
+    public void Hit(int damage)
+    {
+        if (dead) return;
+        currentHealth -= damage;
+        anim.SetTrigger("Hit");
+        UpdateHealthUI();
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+  
+    public void Heal(int amount)
+    {
+        if (dead) return;
+        currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+        UpdateHealthUI();
+    }
+
+    void Die()
+    {
+        dead = true;
+        UnityEngine.Debug.Log("Game Over!");
+        if (GameManager.Instance != null) GameManager.Instance.GameOver();
+    }
+
+    void UpdateHealthUI()
+    {
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        if (healthText != null)
+        {
+            healthText.text = currentHealth.ToString();
         }
     }
 }

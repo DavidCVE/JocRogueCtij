@@ -27,22 +27,23 @@ public class WaveManager : MonoBehaviour
 
     void Update()
     {
-        // Pornim valul nou doar dacă nu rulează deja și apăsăm SPACE
-        if (!waveRunning && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            StartNewWave();
-        }
     }
 
-    void StartNewWave()
+    public void StartNewWave()
     {
         timeText.color = Color.white;
         currentWave++;
         waveRunning = true;
-        currentWaveTime = 30; // Poți schimba durata aici
+        currentWaveTime = 30;
 
         waveText.text = "Wave " + currentWave;
+
         StartCoroutine(WaveTimer());
+
+        if (EnemyManager.instance != null)
+        {
+
+        }
     }
 
     IEnumerator WaveTimer()
@@ -58,6 +59,7 @@ public class WaveManager : MonoBehaviour
                 WaveComplete();
             }
         }
+        yield return null;
     }
 
     void WaveComplete()
@@ -65,7 +67,6 @@ public class WaveManager : MonoBehaviour
         StopAllCoroutines();
         waveRunning = false;
 
-        // 1. Curățăm inamicii
         if (EnemyManager.instance != null)
         {
             EnemyManager.instance.DestroyAllEnemies();
@@ -74,7 +75,9 @@ public class WaveManager : MonoBehaviour
         timeText.color = Color.red;
         timeText.text = "0";
 
-        // 2. MODIFICARE: Declanșăm apariția cardurilor în GameManager
+
+        UnityEngine.Debug.Log("Wave terminat! Se deschid cardurile...");
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.LevelCompleted();

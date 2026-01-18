@@ -13,7 +13,7 @@ TagManager:
   - Water
   - UI
   - Projectile
-  - 
+  - UI_Carduri
   - 
   - 
   - 
@@ -44,6 +44,9 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 288817017
+    locked: 0
+  - name: UI_Carduri
+    uniqueID: 605290169
     locked: 0
   m_RenderingLayers:
   - Default

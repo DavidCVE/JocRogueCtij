@@ -6,12 +6,11 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    // Singleton - Instance cu "I" mare pentru a fi accesibil din CardManager și Card
     public static GameManager Instance;
 
     [Header("Panels")]
     [SerializeField] GameObject gameOverPanel;
-    [SerializeField] GameObject cardSelectionUI; // Panoul care conține cele 3 carduri
+    [SerializeField] GameObject cardSelectionUI;
 
     [Header("Buttons")]
     [SerializeField] Button restartButton;
@@ -20,62 +19,44 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Setăm Singleton-ul
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     void Start()
     {
-        // Configurăm butonul de restart
-        if (restartButton != null)
-            restartButton.onClick.AddListener(RestartGame);
-
-        // Ne asigurăm că panourile sunt ascunse la început
+        if (restartButton != null) restartButton.onClick.AddListener(RestartGame);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (cardSelectionUI != null) cardSelectionUI.SetActive(false);
     }
 
-    // Funcția apelată de WaveManager când timpul expiră
+    // Apelat de WaveManager cand timpul = 0
     public void LevelCompleted()
     {
         currentLevel++;
+        Time.timeScale = 0f; // Pauza
 
-        // 1. Oprim timpul (Pauză)
-        Time.timeScale = 0f;
+        if (cardSelectionUI != null) cardSelectionUI.SetActive(true);
 
-        // 2. Afișăm UI-ul de carduri
-        if (cardSelectionUI != null)
-        {
-            cardSelectionUI.SetActive(true);
-        }
-
-        // 3. Generăm cardurile noi prin CardManager
+        // Generam carduri noi
         if (CardManager.instance != null)
         {
             CardManager.instance.RandomizeNewCards();
         }
     }
 
-    // Funcția apelată de Card.cs după ce jucătorul a dat click pe un card
+    // Apelat de CardManager dupa ce ai ales un card
     public void ResumeAfterCardSelection()
     {
-        // 1. Ascundem meniul
-        if (cardSelectionUI != null)
+        if (cardSelectionUI != null) cardSelectionUI.SetActive(false);
+
+        Time.timeScale = 1f; // Reluam timpul
+
+        // --- MODIFICARE: Pornim automat urmatorul wave
+        if (WaveManager.instance != null)
         {
-            cardSelectionUI.SetActive(false);
+            WaveManager.instance.StartNewWave();
         }
-
-        // 2. Pornim timpul înapoi
-        Time.timeScale = 1f;
-
-        UnityEngine.Debug.Log("Pregătește-te! Apasă SPACE pentru noul val.");
     }
 
     public int GetCurrentLevel()

@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2caa56b4e66a224c88c8fd7d0dd7540, type: 3}
   m_Name: DamageIncrease
   m_EditorClassIdentifier: Assembly-CSharp::CardSO
+  cardName: 
+  cardText: +10 Damage
   cardImage: {fileID: 0}
-  cardText: +10%Damage
   effectType: 0
-  effectValue: 0
+  effectValue: 10
   isUnique: 0
   unlockLevel: 0

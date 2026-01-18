@@ -22,19 +22,16 @@ public class Gun : MonoBehaviour
     {
 
 
-        // Gasim playerul
         player = GameObject.FindGameObjectWithTag("Player").transform;
         anim = GetComponent<Animator>();
-        // Setam offset-ul initial (distanta fata de player)
-        // In video el face asta la min 4:28
-        //SetOffset(new Vector2(1f, 0.5f));
+
     }
 
     void Update()
     {
         if (player == null) return;
 
-        // Punem arma langa player + offset
+
         transform.position = (Vector2)player.position + offset;
 
         FindClosestEnemy();
@@ -98,13 +95,19 @@ public class Gun : MonoBehaviour
     {
         anim.SetTrigger("Shoot");
 
-        // 1. Cream Glontul
-        // AICI E MODIFICAREA DIN VIDEO (Min 09:12):
-        // Salvam glontul intr-o variabila 'proj' si il distrugem dupa 3 secunde
+
         GameObject proj = Instantiate(projectilePrefab, muzzlePosition.position, transform.rotation);
+        Projectile projScript = proj.GetComponent<Projectile>();
+        Player playerScript = FindObjectOfType<Player>();
+
+        
+        if (projScript != null && playerScript != null)
+        {
+            projScript.SetDamage(playerScript.damage);
+        }
         Destroy(proj, 3f);
 
-        // 2. Cream Flash-ul
+
         if (muzzleFlashPrefab != null)
         {
             GameObject flash = Instantiate(muzzleFlashPrefab, muzzlePosition.position, transform.rotation);

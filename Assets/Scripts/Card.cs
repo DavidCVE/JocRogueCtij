@@ -6,7 +6,8 @@ public class Card : MonoBehaviour
     [SerializeField] SpriteRenderer cardImageRenderer;
     [SerializeField] TextMeshPro cardTextRenderer;
 
-    private CardSO cardInfo;
+    // Trebuie să fie 'public' pentru ca CardManager să îl poată citi când dăm click
+    public CardSO cardInfo;
 
     public void Setup(CardSO card)
     {
@@ -15,21 +16,6 @@ public class Card : MonoBehaviour
         if (cardTextRenderer != null) cardTextRenderer.text = card.cardText;
     }
 
-    private void OnMouseDown()
-    {
-        // Trimitem bonusul către jucător
-        if (Player.instance != null)
-        {
-            Player.instance.ApplyPowerUp(cardInfo);
-        }
-
-        // Revenim la joc prin GameManager
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.ResumeAfterCardSelection();
-        }
-
-        // Folosim UnityEngine.Debug pentru a evita eroarea CS0104
-        UnityEngine.Debug.Log("Card selectat cu succes!");
-    }
+    // Am șters OnMouseDown pentru că nu mai este necesar.
+    // CardManager se ocupă acum de detectarea click-ului prin Raycast.
 }

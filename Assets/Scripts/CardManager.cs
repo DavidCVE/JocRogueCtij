@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem; 
 
 public class CardManager : MonoBehaviour
 {
@@ -20,15 +21,38 @@ public class CardManager : MonoBehaviour
         instance = this;
     }
 
-    // Am comentat Start pentru ca cardurile să apară DOAR la final de Wave, nu la început
-    private void Start()
+    private void Update()
     {
-        // RandomizeNewCards(); 
+        if (cardSelectionUI.activeSelf)
+        {
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                DetectCardClick();
+            }
+        }
+    }
+
+    void DetectCardClick()
+    {
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+
+        Vector2 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+
+        RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+
+        if (hit.collider != null)
+        {
+            Card clickedCard = hit.collider.GetComponent<Card>();
+
+            if (clickedCard != null)
+            {
+                SelectCard(clickedCard.cardInfo);
+            }
+        }
     }
 
     public void RandomizeNewCards()
     {
-        // Ștergem cardurile vechi dacă există
         if (cardOne != null) Destroy(cardOne);
         if (cardTwo != null) Destroy(cardTwo);
         if (cardThree != null) Destroy(cardThree);
@@ -36,8 +60,6 @@ public class CardManager : MonoBehaviour
         List<CardSO> randomizedCards = new List<CardSO>();
         List<CardSO> availableCards = new List<CardSO>(deck);
 
-        // --- COD CORECTAT AICI ---
-        // S-a schimbat 'unlocklevel' în 'unlockLevel' pentru a elimina eroarea CS1061
         availableCards.RemoveAll(card =>
             (card.isUnique && alreadySelectedCards.Contains(card)) ||
             (GameManager.Instance != null && card.unlockLevel > GameManager.Instance.GetCurrentLevel())
@@ -46,6 +68,7 @@ public class CardManager : MonoBehaviour
         if (availableCards.Count < 3)
         {
             UnityEngine.Debug.Log("Not enough available cards");
+            GameManager.Instance.ResumeAfterCardSelection();
             return;
         }
 
@@ -58,7 +81,6 @@ public class CardManager : MonoBehaviour
             }
         }
 
-        // Creăm obiectele pe pozițiile setate în Inspector
         cardOne = InstantiateCard(randomizedCards[0], cardPositionOne);
         cardTwo = InstantiateCard(randomizedCards[1], cardPositionTwo);
         cardThree = InstantiateCard(randomizedCards[2], cardPositionThree);
@@ -67,6 +89,7 @@ public class CardManager : MonoBehaviour
     GameObject InstantiateCard(CardSO cardSO, Transform position)
     {
         GameObject cardGo = Instantiate(cardPrefab, position.position, Quaternion.identity, position);
+
         Card cardScript = cardGo.GetComponent<Card>();
 
         if (cardScript != null)
@@ -75,5 +98,51 @@ public class CardManager : MonoBehaviour
         }
 
         return cardGo;
+    }
+
+    public void SelectCard(CardSO selectedCard)
+    {
+        if (selectedCard.isUnique)
+        {
+            alreadySelectedCards.Add(selectedCard);
+        }
+
+        Player player = FindObjectOfType<Player>();
+
+
+        GunManager gunManager = FindObjectOfType<GunManager>();
+
+        if (player != null)
+        {
+            switch (selectedCard.effectType)
+            {
+                case CardEffectType.DamageIncrease:
+                    UnityEngine.Debug.Log("Damage crescut!");
+
+                    // Asigură-te că această linie NU are // în față:
+                    player.damage += (int)selectedCard.effectValue;
+                    break;
+
+                case CardEffectType.HealthIncrease:
+                    player.maxHealth += (int)selectedCard.effectValue;
+                    player.Heal((int)selectedCard.effectValue);
+                    break;
+
+                case CardEffectType.SpeedIncrease:
+                    player.moveSpeed += selectedCard.effectValue;
+                    break;
+
+
+                case CardEffectType.NewGun:
+                    if (gunManager != null)
+                    {
+                        gunManager.AddGun();
+                        UnityEngine.Debug.Log("Arma noua adaugata!");
+                    }
+                    break;
+            }
+        }
+
+        GameManager.Instance.ResumeAfterCardSelection();
     }
 }

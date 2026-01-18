@@ -9,7 +9,7 @@ public class EnemyManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] GameObject enemyPrefab;
 
-    // MODIFICARE 1: Adăugăm un loc pentru noul inamic (Charger)
+
     [SerializeField] GameObject chargerPrefab;
 
     [SerializeField] float timeBetweenSpawns = 1f;
@@ -41,7 +41,7 @@ public class EnemyManager : MonoBehaviour
 
     private void Update()
     {
-        // Verificăm dacă WaveManager ne lasă să spawnăm
+
         if (WaveManager.instance != null && WaveManager.instance.waveRunning == false)
         {
             return;
@@ -62,21 +62,21 @@ public class EnemyManager : MonoBehaviour
         float randomY = UnityEngine.Random.Range(-8f, 8f);
         Vector2 spawnPosition = new Vector2(randomX, randomY);
 
-        // MODIFICARE 2: Alegem ce inamic spawnăm
+
         GameObject enemyToSpawn;
 
         int roll = UnityEngine.Random.Range(0, 100);
 
         if (roll < 80)
         {
-            enemyToSpawn = enemyPrefab;   // 80% șanse pentru inamic normal
+            enemyToSpawn = enemyPrefab;   
         }
         else
         {
-            enemyToSpawn = chargerPrefab; // 20% șanse pentru Charger
+            enemyToSpawn = chargerPrefab; 
         }
 
-        // Folosim 'enemyToSpawn' în loc de 'enemyPrefab' direct
+
         GameObject newEnemy = Instantiate(enemyToSpawn, spawnPosition, Quaternion.identity);
 
         enemies.Add(newEnemy);
