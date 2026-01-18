@@ -1,115 +1,51 @@
-﻿using TMPro;
-using UnityEngine;
-using UnityEngine.InputSystem;
+﻿using UnityEngine;
+using UnityEngine.InputSystem; // Adăugat pentru a rezolva eroarea de Input
 
 public class Player : MonoBehaviour
 {
-    public static Player instance; // Singleton pentru acces ușor din scriptul Card
+    public static Player instance;
 
-    [Header("UI & Components")]
-    [SerializeField] TextMeshProUGUI healthText;
-    Animator anim;
-    Rigidbody2D rb;
-
-    [Header("Stats")]
-    [SerializeField] float moveSpeed = 6f;
+    [Header("Player Stats")]
+    [SerializeField] float moveSpeed = 5f;
     [SerializeField] int maxHealth = 100;
-    public int damage = 20; // Variabilă nouă pentru atac
     int currentHealth;
-    bool dead = false;
-
-    Vector2 movement;
-    int facingDirection = 1;
 
     private void Awake()
     {
-        instance = this;
-    }
-
-    private void Start()
-    {
-        anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
+        if (instance == null) instance = this;
         currentHealth = maxHealth;
-        UpdateHealthUI();
     }
 
-    // Funcția care aplică bonusul ales de pe card
+    void Update()
+    {
+        // REPARARE EROARE INPUT: Folosim Keyboard.current în loc de Input.GetAxisRaw
+        Vector2 moveInput = Vector2.zero;
+
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) moveInput.y = 1;
+            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) moveInput.y = -1;
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) moveInput.x = -1;
+            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) moveInput.x = 1;
+        }
+
+        // Mișcarea normalizată pentru a nu merge mai repede pe diagonală
+        transform.position += (Vector3)moveInput.normalized * moveSpeed * Time.deltaTime;
+    }
+
     public void ApplyPowerUp(CardSO card)
     {
-        switch (card.effectType)
+        // REPARARE EROARE DEBUG: Folosim UnityEngine.Debug pentru a evita conflictul
+        if (card.cardText.Contains("health"))
         {
-            case CardEffect.DamageIncrease:
-                damage += (int)card.effectValue;
-                UnityEngine.Debug.Log("Atac mărit! Nou damage: " + damage);
-                break;
-            case CardEffect.HealthIncrease:
-                currentHealth += (int)card.effectValue;
-                if (currentHealth > maxHealth) maxHealth = currentHealth;
-                UpdateHealthUI();
-                UnityEngine.Debug.Log("Viață mărită! Nouă viață: " + currentHealth);
-                break;
+            currentHealth += 20;
+            if (currentHealth > maxHealth) currentHealth = maxHealth;
+            UnityEngine.Debug.Log("Viata marita! HP actual: " + currentHealth);
         }
-    }
-
-    void OnMove(InputValue value)
-    {
-        if (dead) return;
-        movement = value.Get<Vector2>();
-    }
-
-    private void Update()
-    {
-        if (dead)
+        else if (card.cardText.Contains("Speed"))
         {
-            movement = Vector2.zero;
-            anim.SetFloat("velocity", 0);
-            return;
+            moveSpeed += 1.5f;
+            UnityEngine.Debug.Log("Viteza marita! Viteza actuala: " + moveSpeed);
         }
-        anim.SetFloat("velocity", movement.magnitude);
-
-        if (movement.x != 0)
-        {
-            facingDirection = movement.x > 0 ? 1 : -1;
-            if (transform.childCount > 0)
-                transform.GetChild(0).localScale = new Vector2(facingDirection, 1);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (dead)
-        {
-            rb.linearVelocity = Vector2.zero;
-            return;
-        }
-        rb.linearVelocity = movement * moveSpeed;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Enemy")) Hit(20);
-    }
-
-    public void Hit(int damageAmount)
-    {
-        if (dead) return;
-        currentHealth -= damageAmount;
-        anim.SetTrigger("Hit");
-        UpdateHealthUI();
-        if (currentHealth <= 0) Die();
-    }
-
-    void Die()
-    {
-        dead = true;
-        UnityEngine.Debug.Log("Game Over!");
-        GameManager.Instance.GameOver();
-    }
-
-    void UpdateHealthUI()
-    {
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        if (healthText != null) healthText.text = currentHealth.ToString();
     }
 }

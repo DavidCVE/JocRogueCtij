@@ -1,5 +1,5 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
+using TMPro;
 
 public class Card : MonoBehaviour
 {
@@ -11,25 +11,25 @@ public class Card : MonoBehaviour
     public void Setup(CardSO card)
     {
         cardInfo = card;
-        cardImageRenderer.sprite = card.cardImage;
-        cardTextRenderer.text = card.cardText;
+        if (cardImageRenderer != null) cardImageRenderer.sprite = card.cardImage;
+        if (cardTextRenderer != null) cardTextRenderer.text = card.cardText;
     }
 
-    // Această funcție se declanșează când dai click pe card
-    // ATENȚIE: Cardul trebuie să aibă un BoxCollider2D!
     private void OnMouseDown()
     {
-        // 1. Aplicăm bonusul jucătorului folosind Singleton-ul din clasa Player
+        // Trimitem bonusul către jucător
         if (Player.instance != null)
         {
             Player.instance.ApplyPowerUp(cardInfo);
-            UnityEngine.Debug.Log("Ai ales cardul: " + cardInfo.cardText);
         }
 
-        // 2. Închidem meniul de carduri și reluăm timpul jocului
+        // Revenim la joc prin GameManager
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ResumeAfterCardSelection();
         }
+
+        // Folosim UnityEngine.Debug pentru a evita eroarea CS0104
+        UnityEngine.Debug.Log("Card selectat cu succes!");
     }
 }

@@ -27,22 +27,21 @@ public class WaveManager : MonoBehaviour
 
     void Update()
     {
-        // Pornim valul următor doar dacă nu rulează deja și apăsăm SPACE
+        // Pornim valul nou doar dacă nu rulează deja și apăsăm SPACE
         if (!waveRunning && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             StartNewWave();
         }
     }
 
-    public void StartNewWave()
+    void StartNewWave()
     {
         timeText.color = Color.white;
         currentWave++;
         waveRunning = true;
-        currentWaveTime = 30; // Durata rundei (poți pune 60 dacă vrei un minut)
+        currentWaveTime = 30; // Poți schimba durata aici
 
         waveText.text = "Wave " + currentWave;
-
         StartCoroutine(WaveTimer());
     }
 
@@ -66,7 +65,7 @@ public class WaveManager : MonoBehaviour
         StopAllCoroutines();
         waveRunning = false;
 
-        // 1. Curățăm inamicii existenți
+        // 1. Curățăm inamicii
         if (EnemyManager.instance != null)
         {
             EnemyManager.instance.DestroyAllEnemies();
@@ -75,7 +74,7 @@ public class WaveManager : MonoBehaviour
         timeText.color = Color.red;
         timeText.text = "0";
 
-        // 2. APARE MENIUL DE CARDURI (Legătura cu GameManager)
+        // 2. MODIFICARE: Declanșăm apariția cardurilor în GameManager
         if (GameManager.Instance != null)
         {
             GameManager.Instance.LevelCompleted();
